@@ -41,9 +41,7 @@ public class DreadlordSword extends ProjectileWeaponItem {
     public static final int DEFAULT_RANGE = 15;
 
     protected static List<ItemStack> cdraw(ItemStack pWeapon, ItemStack pAmmo, LivingEntity pShooter) {
-        if (pAmmo.isEmpty()) {
-            return List.of();
-        } else {
+
             int i = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MULTISHOT, pWeapon);
             int j = i == 0 ? 1 : 3;
             List<ItemStack> list = new ArrayList<>(j);
@@ -55,7 +53,7 @@ public class DreadlordSword extends ProjectileWeaponItem {
             }
 
             return list;
-        }
+
     }
 
     protected static ItemStack cuseAmmo(ItemStack pWeapon, ItemStack pAmmo, LivingEntity pShooter, boolean pIntangable) {
