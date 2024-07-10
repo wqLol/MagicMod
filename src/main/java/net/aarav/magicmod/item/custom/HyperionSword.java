@@ -1,5 +1,6 @@
 package net.aarav.magicmod.item.custom;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
@@ -37,6 +38,9 @@ public class HyperionSword extends SwordItem {
     private static int TPDISTANCE=10;
     private static int DAMAGERAD = 5;
     private static float DMGAMT = 120f;
+    private static float BEAMDMGRAD = 0.5f;
+    private static int BEAMDDIST = 100;
+    private boolean leftPressed = false;
 
     public HyperionSword(Tier pTier, Properties pProperties) {
         super(pTier, pProperties);
@@ -45,6 +49,46 @@ public class HyperionSword extends SwordItem {
     @Override
     public UseAnim getUseAnimation(ItemStack pStack) {
         return UseAnim.SPEAR;
+    }
+
+
+
+    @Override
+    public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
+        if (!pIsSelected){
+            return;
+        }
+        Minecraft minecraft = Minecraft.getInstance();
+        if (pEntity instanceof Player){
+            if (minecraft.options.keyAttack.isDown() ){
+                this.leftPressed=true;
+//                pEntity.sendSystemMessage(Component.literal("Hello"));
+                int i = 4;
+                BlockPos bp;
+                Vec3 vec3;
+
+                List<LivingEntity> entities = pLevel.getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, ((Player)pEntity), new AABB( pEntity.blockPosition()).inflate(BEAMDMGRAD));
+                while (entities.isEmpty()){
+                    vec3 = pEntity.position().add(pEntity.getForward().scale(i));
+
+                    bp = new BlockPos(new Vec3i(((int)vec3.x),((int)vec3.y),((int)vec3.z)));
+                    entities = pLevel.getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, ((Player)pEntity), new AABB(bp).inflate(BEAMDMGRAD));
+                    pLevel.addParticle(ParticleTypes.SMOKE, vec3.x,vec3.y+1.7f,vec3.z , 0.0, 0.0, 0.0);
+                    i++;
+                    if (i==BEAMDDIST) return;
+                    entities.remove(pEntity);
+
+                }
+                for (Entity e : entities){
+                    if (!e.is(pEntity)) {
+                        DamageSource dmgSource = pLevel.damageSources().generic();
+                        e.hurt(dmgSource, 10f);
+                    }
+                }
+            }
+
+        }
+        super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
     }
 
     @Override
