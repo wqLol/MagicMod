@@ -1,7 +1,10 @@
 package net.aarav.magicmod;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 import net.aarav.magicmod.item.ModItems;
+import net.aarav.magicmod.item.custom.ElementalWand;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -10,6 +13,8 @@ import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -39,15 +44,33 @@ public class MagicMod
 
         ModItems.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
+        modEventBus.addListener(this::onRegisterKeyMappings);
+//        MinecraftForge.EVENT_BUS.addListener(ElementalWand::onKeyInput);
 
         modEventBus.addListener(this::addCreative);
 
     }
-
+    public static final KeyMapping IncrementSpell = new KeyMapping(
+            "key.magicmod.incrementspell", // Translation key for the key binding
+            InputConstants.Type.KEYSYM , // Type of key input
+            5, // Default key (P)
+            "key.categories.misc" // Category
+    );
+    public static final KeyMapping DecrementSpell = new KeyMapping(
+            "key.magicmod.decrementspell", // Translation key for the key binding
+            InputConstants.Type.MOUSE , // Type of key input
+            3, // Default key (P)
+            "key.categories.misc" // Category
+    );
     private void commonSetup(final FMLCommonSetupEvent event)
     {
 
     }
+    private void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        event.register(IncrementSpell);
+        event.register(DecrementSpell);
+    }
+
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
